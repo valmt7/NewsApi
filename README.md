@@ -27,5 +27,5 @@
 
 ### 1. Клонування репозиторію
 ```bash
-git clone [https://github.com/NewsApi/ТВІЙ_РЕПОЗИТОРІЙ.git](https://github.com/valmt7/NewsApi)
+git clone [https://github.com/NewsApi/NewsApi.git](https://github.com/valmt7/NewsApi.git)
 cd NewsApi
