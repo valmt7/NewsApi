@@ -10,10 +10,12 @@ using Newtonsoft.Json;
 public class Game : IGame
 {
     private readonly string _RAWG_API_KEY;
+    private readonly IPGSQL _pgsql;
 
-    public Game(IConfiguration config)
+    public Game(IConfiguration config, IPGSQL ipgsql)
     {
         _RAWG_API_KEY = config["RAWG_API_KEY"];
+        _pgsql = ipgsql;
     }
 
     public async Task<FindedGameobjects> FindGame(string gameName)
@@ -103,6 +105,45 @@ public class Game : IGame
                 result.Add(responseResults[i]);
             }
 
+            return result;
+
+
+        }
+        return null;
+    }
+    public async Task<List<FreeGameApiObject>> GetLastFreeGames(string userId)
+    {
+        var option = new RestClientOptions("https://www.freetogame.com/api");
+        using var client = new RestClient(option);
+        var request = new RestRequest("/games", Method.Get);
+        request.AddQueryParameter("sort-by", "release-date");
+        var response = await client.ExecuteAsync(request);
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            int userLastGameId = await _pgsql.GetLastGameId(userId);
+            var result = new List<FreeGameApiObject>();
+            var responseResults = JsonConvert.DeserializeObject<List<FreeGameApiObject>>(response.Content);
+            var lastGameId = responseResults.First().id;
+            if (userLastGameId == -1)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    result.Add(responseResults[i]);
+                }
+            }
+            else
+            {
+                
+                for (int i = 0; i < responseResults.Count(); i++)
+                {
+                    if (userLastGameId == responseResults[i].id)
+                    {
+                        break;
+                    }
+                    result.Add(responseResults[i]);
+                }
+            }
+            await _pgsql.EditLastGameId(userId, lastGameId);
             return result;
 
 

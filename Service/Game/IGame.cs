@@ -4,4 +4,5 @@ public interface IGame
 {
     public Task<FindedGameobjects> FindGame(string gameName);
     public Task<List<FreeGameApiObject>> GetLastFiveFreeGames(string userId);
+    public Task<List<FreeGameApiObject>> GetLastFreeGames(string userId);
 }

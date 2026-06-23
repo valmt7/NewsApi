@@ -34,5 +34,16 @@ public class Game : ControllerBase
         }
         return Ok(games);
     }
+
+    [HttpGet("lastgamesforuser")]
+    public async Task<IActionResult> FindFreeGamesForuser(string userId)
+    {
+        var games = await _game.GetLastFreeGames(userId);
+        if (games == null)
+        {
+            return NotFound("Ігри не знайдено.");
+        }
+        return Ok(games);
+    }
     
 }
